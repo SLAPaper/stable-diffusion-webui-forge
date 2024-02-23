@@ -571,8 +571,12 @@ class ExtraNetworksPage:
         """
         Find a preview PNG for a given path (without extension) and call link_preview on it.
         """
+        from itertools import chain
 
-        potential_files = sum([[f"{path}.{ext}", f"{path}.preview.{ext}"] for ext in allowed_preview_extensions()], [])
+        potential_files = chain(
+            (f"{path}.{ext}" for ext in allowed_preview_extensions()),
+            (f"{path}.preview.{ext}" for ext in allowed_preview_extensions()),
+        )
 
         for file in potential_files:
             if self.lister.exists(file):
