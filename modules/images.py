@@ -610,11 +610,6 @@ def save_image(image, path, basename, seed=None, prompt=None, extension='png', i
     """
     namegen = FilenameGenerator(p, seed, prompt, image)
 
-    # WebP and JPG formats have maximum dimension limits of 16383 and 65535 respectively. switch to PNG which has a much higher limit
-    if (image.height > 65535 or image.width > 65535) and extension.lower() in ("jpg", "jpeg") or (image.height > 16383 or image.width > 16383) and extension.lower() == "webp":
-        print('Image dimensions too large; saving as PNG')
-        extension = ".png"
-
     if save_to_dirs is None:
         save_to_dirs = (grid and opts.grid_save_to_dirs) or (not grid and opts.save_to_dirs and not no_prompt)
 
@@ -685,6 +680,50 @@ def save_image(image, path, basename, seed=None, prompt=None, extension='png', i
         fullfn_without_extension = fullfn_without_extension[:max_name_len - max(4, len(extension))]
         params.filename = fullfn_without_extension + extension
         fullfn = params.filename
+
+    if extension.lower() == ".webp":
+        import sys
+
+        # webp only allows for 16383*16383, for larger images, save a jpeg file at original size
+        # https://developers.google.com/speed/webp/faq#what_is_the_maximum_size_a_webp_image_can_be
+        if max(image.width, image.height) > 16383:
+            print("[INFO]:",
+                  "webp has size limit of (16383, 16383),",
+                  f"while current size is ({image.width}, {image.height}),",
+                  "will save a jpeg instead",
+                  file=sys.stderr)
+
+            extension = ".jpg"
+            fullfn = fullfn_without_extension + ".jpg"
+
+        # very large webp image that reach nearly both limit may also cause PARTITION0_OVERFLOW error, see
+        # [-partition_limit int] in https://developers.google.com/speed/webp/docs/cwebp#lossy_options
+        elif image.width * image.height > 16383**2 // 2:
+            print(
+                "[INFO]:",
+                "webp may throw PARTITION0_OVERFLOW when handling large image,",
+                f"while current size is ({image.width}, {image.height}),",
+                "will save a jpeg instead",
+                file=sys.stderr)
+
+            extension = ".jpg"
+            fullfn = fullfn_without_extension + ".jpg"
+
+    if extension.lower() in (".jpeg", ".jpg"):
+        import sys
+
+        # jpeg only allows for 65535*65535, for larger images, save a png file instead
+        # https://www.adobe.com/creativecloud/file-types/image/comparison/jpeg-vs-png.html
+        if max(image.width, image.height) > 65535:
+            print("[INFO]:",
+                  "jpeg has size limit of (65535, 65535),",
+                  f"while current size is ({image.width}, {image.height}),",
+                  "will save a png instead",
+                  file=sys.stderr)
+
+            extension = ".png"
+            fullfn = fullfn_without_extension + ".png"
+
     _atomically_save_image(image, fullfn_without_extension, extension)
 
     image.already_saved_as = fullfn
