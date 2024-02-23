@@ -3,6 +3,9 @@ from __future__ import annotations
 import os
 import time
 
+import urllib3
+urllib3.disable_warnings()
+
 from modules import timer
 from modules import initialize_util
 from modules import initialize
