@@ -67,10 +67,8 @@ def load_lora_for_models(model, clip, lora, strength_model, strength_clip, filen
     lora_clip, lora_unmatch = ldm_patched.modules.lora.load_lora(lora_unmatch, clip_keys)
 
     if len(lora_unmatch) > 12:
-        print(f'[LORA] LoRA version mismatch for {model_flag}: {filename}')
-        return model, clip
-
-    if len(lora_unmatch) > 0:
+        print(f'[LORA] Loading {filename} for {model_flag} with {len(lora_unmatch)} unmatched keys, result may be incorrect.')
+    elif len(lora_unmatch) > 0:
         print(f'[LORA] Loading {filename} for {model_flag} with unmatched keys {list(lora_unmatch.keys())}')
 
     new_model = model.clone() if model is not None else None
