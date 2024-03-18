@@ -13,6 +13,7 @@ from modules_forge.forge_sampler import sampling_prepare, sampling_cleanup
 samplers_k_diffusion = [
     ('DPM++ 2M Karras', 'sample_dpmpp_2m', ['k_dpmpp_2m_ka'], {'scheduler': 'karras'}),
     ('DPM++ 2M alt Karras', 'sample_dpmpp_2m_alt', ['k_dpmpp_2m_alt_ka'], {'scheduler': 'karras'}),
+    ('DPM++ 2M alt Exponential', 'sample_dpmpp_2m_alt', ['k_dpmpp_2m_alt_exp'], {'scheduler': 'exponential'}),
     ('DPM++ SDE Karras', 'sample_dpmpp_sde', ['k_dpmpp_sde_ka'], {'scheduler': 'karras', "second_order": True, "brownian_noise": True}),
     ('DPM++ 2M SDE Exponential', 'sample_dpmpp_2m_sde', ['k_dpmpp_2m_sde_exp'], {'scheduler': 'exponential', "brownian_noise": True}),
     ('DPM++ 2M SDE Karras', 'sample_dpmpp_2m_sde', ['k_dpmpp_2m_sde_ka'], {'scheduler': 'karras', "brownian_noise": True}),
