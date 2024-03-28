@@ -72,7 +72,7 @@ def sample_dpmpp_2m_alt(model, x, sigmas, extra_args=None, callback=None, disabl
         old_denoised = denoised * adjustment_factor
     return x
 
-k_diffusion.sampling.sample_dpmpp_2m_alt = sample_dpmpp_2m_alt
+setattr(k_diffusion.sampling, "sample_dpmpp_2m_alt", sample_dpmpp_2m_alt)
 
 
 samplers_data_k_diffusion = [
